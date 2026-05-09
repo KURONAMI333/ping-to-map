@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": ["${mod_authors}"],
+  "contact": {
+    "homepage": "https://github.com/KURONAMI333/ping-to-map",
+    "issues":   "https://github.com/KURONAMI333/ping-to-map/issues",
+    "sources":  "https://github.com/KURONAMI333/ping-to-map"
+  },
+  "license": "${mod_license}",
+
+  "environment": "client",
+
+  "entrypoints": {
+    "client": ["com.kuronami.pingtomap.PingToMapFabric"]
+  },
+
+  "mixins": [
+    "pingtomap.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader":     ">=0.15",
+    "fabric-api":       "*",
+    "minecraft":        "~1.20.1",
+    "java":             ">=17",
+    "pingwheel":        "*",
+    "forgeconfigapiport": "*"
+  },
+
+  "suggests": {
+    "journeymap": "*"
+  }
+}

@@ -1,0 +1,50 @@
+# Ping to Map - Forge 1.21.1 mods.toml
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+displayURL="https://github.com/KURONAMI333/ping-to-map"
+issueTrackerURL="https://github.com/KURONAMI333/ping-to-map/issues"
+description='''
+Ping to Map (P2M) for Forge 1.21.1 — Pop a temporary JourneyMap waypoint when a teammate (or yourself) pings a location with Ping-Wheel.
+'''
+
+# Mixin 設定 (Ping-Wheel の PingManager.acceptPingPacket をフック)
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+# ─── 必須依存 ───────────────────────────────────────────────
+[[dependencies.${mod_id}]]
+    modId="forge"
+    type="required"
+    versionRange="${forge_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Ping-Wheel: Mixin ターゲット (CLIENT)
+[[dependencies.${mod_id}]]
+    modId="pingwheel"
+    type="required"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+# JourneyMap: optional
+[[dependencies.${mod_id}]]
+    modId="journeymap"
+    type="optional"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="CLIENT"
