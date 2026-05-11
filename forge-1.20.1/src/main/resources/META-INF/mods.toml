@@ -18,28 +18,28 @@ config="${mod_id}.mixins.json"
 
 [[dependencies.${mod_id}]]
     modId="forge"
-    type="required"
+    mandatory=true
     versionRange="${forge_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
-    type="required"
+    mandatory=true
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="pingwheel"
-    type="required"
+    mandatory=true
     versionRange="[0,)"
     ordering="AFTER"
     side="CLIENT"
 
 [[dependencies.${mod_id}]]
     modId="journeymap"
-    type="optional"
+    mandatory=false
     versionRange="[0,)"
     ordering="AFTER"
     side="CLIENT"
