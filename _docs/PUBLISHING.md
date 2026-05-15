@@ -1,6 +1,13 @@
-# Publishing Checklist
+# Publishing Checklist — Ping to Map (P2M)
 
-Modrinth / CurseForge への公開手順。
+Modrinth / CurseForge への公開・更新手順。
+
+> このファイルは以前 Compass to Map の PUBLISHING.md をコピーしたまま
+> P2M 用に更新されていなかった（2026-05-15 修正）。以下は P2M の事実に
+> 即した内容。
+
+現状: **v1.0.3 公開済み**（Modrinth `ping-to-map` / CurseForge `ping-to-map`）。
+以下は更新リリース時に使う生きたチェックリスト。
 
 ---
 
@@ -8,93 +15,56 @@ Modrinth / CurseForge への公開手順。
 
 ### コード・ビルド
 
-- [ ] `mod_version` を `gradle.properties` で更新（semver: 1.0.0 等）
-- [ ] `./gradlew clean build` でクリーンビルド
-- [ ] `build/libs/compasstomap-x.y.z.jar` のサイズ確認（テスト用 localRuntime が混入してないか、約 30〜50KB 程度）
-- [ ] `./gradlew runClient` で実機動作確認
-  - [ ] Explorer's Compass で構造物検索 → 発見 → JM waypoint 自動登録
-  - [ ] チャット通知（OP 状態 = クリック可能、非 OP = 装飾なし）
-  - [ ] 同じ構造物を再検索 → dedupe（再登録されない）
-  - [ ] 別の構造物を検索 → 新 waypoint 追加
-  - [ ] カテゴリ別色分け（村/要塞/ダンジョン等）
+- [ ] `mod_version` を `gradle.properties` で更新（semver）
+- [ ] 各サブプロジェクトで `./gradlew clean build`（NeoForge 1.21.1 = ルート、
+      `forge-1.20.1` / `fabric-1.21.1` / `fabric-1.20.1`）
+- [ ] 各 `build/libs/pingtomap-x.y.z.jar` のサイズ確認（localRuntime 混入なし）
+- [ ] `./gradlew runClient` で実機確認
+  - [ ] Ping-Wheel で ping → JM に一時 waypoint 出現（シアン/チームカラー）
+  - [ ] 設定秒数で自動消滅
+  - [ ] 同一プレイヤー連続 ping → 古い waypoint が置き換わる（UUID 単位 1 つ）
+  - [ ] Fabric ビルドは JM 統合 disable・チャット通知のみ（既知制限どおり）
 
 ### ドキュメント
 
-- [ ] `README.md` 機能リスト / 設定 / 互換 / FAQ が最新
-- [ ] `LICENSE` が存在
-- [ ] `_docs/ROADMAP.md` 更新
-- [ ] バージョン番号が各所一致（`gradle.properties`, `mods.toml` template, README）
+- [ ] `README.md` の機能 / 設定 / 互換 / インストール（jar 名 `pingtomap-x.y.z.jar`）が最新
+- [ ] `LICENSE` 存在
+- [ ] `_docs/ROADMAP.md` / `_docs/CHANGELOG.md` 更新
+- [ ] バージョン番号が各所一致（`gradle.properties`・mods.toml/fabric.mod.json・README）
 
 ### メタデータ
 
-- [ ] `neoforge.mods.toml` の `displayURL` / `issueTrackerURL` が GitHub repo URL に
+- [ ] `displayURL` / `issueTrackerURL` が `github.com/KURONAMI333/ping-to-map`
 - [ ] `description` が現状機能と合致
-- [ ] `authors`, `license` が正しい
+- [ ] `authors=KURONAMI` / `license=MIT`
 
 ---
 
-## Modrinth 初回公開手順
+## ストア事実（説明文・タグの基準）
 
-1. https://modrinth.com/dashboard/new-project でプロジェクト作成
-2. 必須情報入力:
-   - **Project name**: `Compass to Map`
-   - **Project ID/slug**: `compass-to-map`
-   - **Project type**: `Mod`
-   - **Summary**: README の冒頭 1 行コンセプト
-3. アイコン (256x256 推奨)、ギャラリー画像をアップロード
-4. **Description** に README をコピペ（Markdown 対応）
-5. **Categories** にチェック:
-   - `utility`, `adventure`, `optimization`
-6. **Game versions**: 1.21.1
-7. **Loaders**: NeoForge
-8. **Environment**:
-   - Client: `required`
-   - Server: `required`
-9. **License**: `MIT`
-10. **Links**:
-    - Source: GitHub repo URL
-    - Issues: GitHub Issues URL
-11. プロジェクト作成 → Submit for review (Modrinth 承認、数時間〜数日)
-12. 承認後、Versions タブから新バージョンをアップロード:
-    - **Version**: `1.0.0` / `1.0.0 - Initial release`
-    - **Release type**: `Release`
-    - **Game versions**: 1.21.1 / **Loaders**: NeoForge
-    - **Files**: `compasstomap-1.0.0.jar`
-    - **Dependencies**:
-      - Explorer's Compass (required)
-      - JourneyMap (optional, recommended)
+| 項目 | 値 |
+|---|---|
+| Project name | `Ping to Map` |
+| Slug | `ping-to-map` |
+| Mod ID | `pingtomap` / package `com.kuronami.pingtomap` |
+| Loaders × MC | NeoForge/Forge/Fabric × 1.21.1、Forge/Fabric × 1.20.1（**NeoForge 1.20.1 なし**） |
+| Environment | **Client only**（サーバ不要） |
+| 依存 | **Ping-Wheel（必須）** / JourneyMap（任意・推奨、Forge/NeoForge のみ）/ Fabric は Forge Config API Port |
+| 既知制限 | Fabric ビルドは JM 統合 disable（Loom 1.14 未リリース）。チャット通知のみ |
+| License | MIT |
+
+> Description 本文は `README.md` をそのままコピペ（Modrinth は Markdown 可、
+> CurseForge は BBCode/HTML 変換）。jar 実ファイル名は `pingtomap-<version>.jar`
+> （ローダー/MC はストアのタグで区別、ファイル名に接尾辞は付かない）。
 
 ---
 
-## CurseForge 初回公開手順
+## 更新リリース手順
 
-1. https://www.curseforge.com/project/create でプロジェクト作成
-2. 入力:
-   - **Game**: Minecraft
-   - **Project Type**: Mods
-   - **Project Name**: Compass to Map
-   - **Slug**: compass-to-map
-3. カテゴリ:
-   - Map and Information / Utility & QoL / Adventure and RPG
-4. **Description** (BBCode/HTML、Markdown 不可) に README を変換コピペ
-5. **License**: MIT
-6. **Game Versions** タグ: 1.21.1 / **Mod Loaders**: NeoForge
-7. プロジェクト作成 → 承認待ち
-8. 承認後、File Upload:
-   - **File**: `compasstomap-1.0.0.jar`
-   - **Display Name**: `1.0.0 - Initial release`
-   - **Release Type**: `Release`
-   - **Game Versions**: 1.21.1 / **Mod Loader**: NeoForge
-   - **Optional Dependencies**: Explorer's Compass, JourneyMap
-
----
-
-## 更新リリース時 (1.0.0 → 1.0.1)
-
-1. `gradle.properties` の `mod_version=1.0.1`
+1. `gradle.properties` の `mod_version` を更新
 2. `_docs/CHANGELOG.md` 更新
-3. `./gradlew clean build`
+3. 全サブプロジェクト `./gradlew clean build`
 4. 実機で動作確認
-5. Modrinth: Versions タブから新バージョンアップロード
-6. CurseForge: Files タブから新ファイルアップロード
-7. GitHub: タグ付きリリース (`v1.0.1`) を作成
+5. Modrinth: Versions タブから各ローダー/MC の jar をアップロード（タグ付与）
+6. CurseForge: Files タブから同上
+7. GitHub: `vX.Y.Z` タグ付きリリース作成

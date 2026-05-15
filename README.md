@@ -53,7 +53,7 @@ Ping-Wheel は公式 API を持たないため、本 MOD は **Mixin** で `nx.p
 3. **Forge / NeoForge のみ**: [JourneyMap](https://modrinth.com/mod/journeymap) を導入（推奨、これがないと waypoint 登録できない）  
    **Fabric**: 現状 JM 統合 disable ([既知制限](#known-limitations))
 4. **Fabric のみ**: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port) を追加導入
-5. ローダー × MC バージョンに合った `ping2map-1.0.2-{loader}-{mc}.jar` を `mods/` フォルダに放り込む（**クライアントのみで OK**、サーバ不要）
+5. リリースページから、自分のローダー × MC バージョン向けの `pingtomap-1.0.3.jar`（最新版）を `mods/` フォルダに放り込む（**クライアントのみで OK**、サーバ不要）
 
 ---
 
