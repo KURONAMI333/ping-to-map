@@ -14,7 +14,7 @@ You ping "come here!" with Ping-Wheel, but it never shows on the **map** — so 
 
 Ping-Wheel has no public API, so P2M uses a Mixin (`@Inject(at = @At("HEAD"))`) on Ping-Wheel's ping handler to read the pinged coordinates + author, and forwards them to JourneyMap's waypoint API. Ping-Wheel's own behaviour is never interrupted. Inner-class isolation means it never crashes if JourneyMap is absent.
 
-## Supported loaders / versions (v1.0.0+)
+## Supported loaders / versions
 
 | Minecraft | NeoForge | Forge | Fabric |
 |---|:---:|:---:|:---:|
