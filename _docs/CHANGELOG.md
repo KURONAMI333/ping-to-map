@@ -8,6 +8,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [Semver](ht
 ### Notes
 - v2 (Fabric backport, custom waypoint icons) は将来予定。
 
+## [1.1.0] - 2026-06-03
+
+### Fixed
+- JM waypoint が lifetime 経過後も消えない問題を修正 (issue #1)。従来は次の ping 受信時にしか期限切れ掃除が走らず、単発 ping の waypoint がマップに残り続けた。新設の `PingWaypointTicker` (Fabric はクライアント tick コールバック) が毎 client tick で掃除し、後続 ping が無くても確実に消える。logout / ワールド退出時は追跡 waypoint を全削除。
+
+### Added
+- **Fabric 版で JourneyMap 連携を実装** (1.21.1 = JM v2 API / 1.20.1 = JM v1 API)。これまで Fabric は ping 受信ログのみだったが、NeoForge/Forge と同じく一時 waypoint を自動登録するようになった。
+- 全 loader で waypoint 寿命を **Ping-Wheel の pingDuration に同期** (`appearance.syncWithPingWheel`, 既定 ON)。ワールド内の ping とマップ上の waypoint が同時に消える。pingDuration ≥ 60 の永続ピンにも追従。OFF にすると固定 `appearance.waypointLifetimeSec` を使用。
+
+### Compatibility
+- Minecraft 1.21.1 / 1.20.1 — NeoForge / Forge / Fabric — CLIENT 専用
+
 ## [1.0.0] - YYYY-MM-DD (未公開)
 
 ### Added

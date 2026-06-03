@@ -19,6 +19,9 @@ import nx.pingwheel.common.network.PingLocationS2CPacket;
 /**
  * Ping-Wheel S2C packet を JM 一時 waypoint に登録 (Forge 1.20.1, JM v1 API)。
  * 1.21+ の v2 API (WaypointFactory) との差分: Waypoint.Builder 経由。
+ *
+ * 寿命は既定で Ping-Wheel の pingDuration に同期 ({@code resolveLifetimeSec})、毎 client tick
+ * ({@code PingWaypointTicker}) で期限切れを掃除 → ワールド内の ping と waypoint が同時に消える。
  */
 public final class JourneyMapClientHook {
 
@@ -51,7 +54,12 @@ public final class JourneyMapClientHook {
         }
     }
 
+    /**
+     * 期限切れ waypoint を削除。{@code PingWaypointTicker} が毎 client tick で呼ぶので、
+     * 後続 ping が無くても lifetime 経過時に確実に消える。
+     */
     public static void sweepExpired() {
+        if (TRACKED.isEmpty()) return;
         if (!isJourneyMapLoaded()) return;
         long now = System.currentTimeMillis();
         synchronized (TRACKED) {
@@ -68,6 +76,44 @@ public final class JourneyMapClientHook {
                 }
             }
         }
+    }
+
+    /**
+     * 追跡中の ping waypoint をすべて削除する。logout / level unload 時に
+     * {@code PingWaypointTicker} から呼ばれ、ワールドをまたいだ追跡リークを防ぐ。
+     */
+    public static void clearAll() {
+        if (TRACKED.isEmpty()) return;
+        synchronized (TRACKED) {
+            for (ScheduledRemoval r : TRACKED.values()) {
+                try {
+                    Inner.remove(r.waypointGuid);
+                } catch (Throwable t) {
+                    PingToMap.LOGGER.debug("ping waypoint clearAll removal failed: {}", t.toString());
+                }
+            }
+            TRACKED.clear();
+        }
+    }
+
+    /**
+     * waypoint の寿命 (秒) を決める。{@code syncWithPingWheel} が ON (既定) なら
+     * Ping-Wheel の {@code pingDuration} に追従し、ワールド内の ping と waypoint が
+     * 同時に消える。Ping-Wheel は pingDuration が 60 以上だと ping を永続扱いにする
+     * ({@code PingView.isExpired} が {@code pingDuration < 60} を条件にしている) ので、
+     * その場合は -1 (永続) を返して同期を保つ。同期 OFF か config 読み取り失敗時は
+     * 手動の {@code waypointLifetimeSec} にフォールバック。
+     */
+    private static int resolveLifetimeSec() {
+        if (Config.SYNC_WITH_PING_WHEEL.get()) {
+            try {
+                int pingDuration = nx.pingwheel.common.config.ClientConfig.HANDLER.getConfig().getPingDuration();
+                return pingDuration >= 60 ? -1 : pingDuration;
+            } catch (Throwable t) {
+                PingToMap.LOGGER.debug("Ping-Wheel pingDuration を読めず手動寿命にフォールバック: {}", t.toString());
+            }
+        }
+        return Config.WAYPOINT_LIFETIME_SEC.get();
     }
 
     private static final class Inner {
@@ -112,7 +158,8 @@ public final class JourneyMapClientHook {
                             .build();
             api.addWaypoint(PingToMap.MODID, wp);
 
-            int lifetimeSec = Config.WAYPOINT_LIFETIME_SEC.get();
+            // 寿命は Ping-Wheel のピン表示時間に同期するのが既定 → 同時に消える
+            int lifetimeSec = resolveLifetimeSec();
             if (lifetimeSec > 0) {
                 long expireAt = System.currentTimeMillis() + lifetimeSec * 1000L;
                 TRACKED.put(packet.author(), new ScheduledRemoval(wp.getGuid(), expireAt));
