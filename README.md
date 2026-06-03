@@ -24,11 +24,11 @@
 ## Why Ping to Map?
 
 Ping-Wheel で「あそこ来て！」って ping を打っても、**地図上には載らない**から大きい施設だと結局見つけにくい。  
-このアドオン MOD は **ping した瞬間に JM に一時 waypoint を立てる**。30 秒ほどで自動消滅するので地図が散らからない。
+このアドオン MOD は **ping した瞬間に JM に一時 waypoint を立てる**。Ping-Wheel のピン表示時間に同期して消えるので（既定）地図が散らからない。
 
 - 📍 **Ping した瞬間に JM 上に一時 waypoint** (シアン or チームカラー)
 - 🤝 **チーム coop に最適** — 「集合場所」「敵発見」「採掘地点」を一目で共有
-- 🕒 **30 秒で自動消滅** (Config で 1〜600 秒に変更可、永続化も可)
+- 🕒 **ピンと同時に自動消滅** — 既定で Ping-Wheel の pingDuration に同期（Config で固定 1〜600 秒や永続にも変更可）
 - 🌐 **クライアント MOD のみ** — サーバ側に入れる必要なし
 - 💡 **既存 MOD に依存**: Ping-Wheel + JourneyMap が既に入ってるなら追加するだけ
 
@@ -53,7 +53,7 @@ Ping-Wheel は公式 API を持たないため、本 MOD は **Mixin** で `nx.p
 3. **Forge / NeoForge のみ**: [JourneyMap](https://modrinth.com/mod/journeymap) を導入（推奨、これがないと waypoint 登録できない）  
    **Fabric**: 現状 JM 統合 disable ([既知制限](#known-limitations))
 4. **Fabric のみ**: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port) を追加導入
-5. リリースページから、自分のローダー × MC バージョン向けの `pingtomap-1.0.3.jar`（最新版）を `mods/` フォルダに放り込む（**クライアントのみで OK**、サーバ不要）
+5. リリースページから、自分のローダー × MC バージョン向けの `pingtomap` jar（最新版）を `mods/` フォルダに放り込む（**クライアントのみで OK**、サーバ不要）
 
 ---
 
@@ -86,9 +86,9 @@ Ping-Wheel は公式 API を持たないため、本 MOD は **Mixin** で `nx.p
 ### Fabric ビルド: JourneyMap 統合 disable
 **1.20.1 / 1.21.1 の Fabric ビルドのみ**、JourneyMap への waypoint 自動登録が現状 **無効**。Mixin での Ping-Wheel フックは動くが、JM への登録呼び出しがスキップされる。
 
-理由: JourneyMap Fabric jar が要求する Loom 1.14 がまだ unreleased で、現在の Loom 1.10-SNAPSHOT では JM API がリンクできない。
+理由: JourneyMap の Fabric ビルドは addon 用の client waypoint API（`IClientAPI` plugin インターフェース）を runtime で公開していない（Forge/NeoForge 専用）。compile 用 API jar は存在するが、JM 本体の Fabric jar が実装を含まないため、Fabric から JM に waypoint を追加することはできない。
 
-将来予定: JM v1.1/v2.1 reflection bridge による迂回実装。Loom 1.14 リリースかリフレクションブリッジのどちらか早い方で解消予定。
+Fabric で map に ping を出したい場合は姉妹 MOD **Ping to Map: Xaero's edition** を使う（Xaero's は Fabric でも API を公開している）。
 
 ### NeoForge 1.20.1 ビルドなし
 NeoForge は 1.21+ から派生したプロジェクトのため、1.20.1 用 NeoForge ビルドは存在しない。1.20.1 で NeoForge 系を使いたい場合は Forge 1.20.1 ビルドを使ってください。
