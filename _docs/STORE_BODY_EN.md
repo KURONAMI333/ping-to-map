@@ -2,20 +2,21 @@
 
 Drops a temporary JourneyMap waypoint the instant someone pings a spot with Ping-Wheel.
 
-You ping "come here" with Ping-Wheel, but it never shows on the map, so on big builds people still can't find the spot. This addon puts a waypoint there the moment a ping happens and clears it after about 30 seconds so the map stays tidy.
+You ping "come here" with Ping-Wheel, but it never shows on the map, so on big builds people still can't find the spot. This addon puts a waypoint there the moment a ping happens, and by default it disappears together with the Ping-Wheel ping so the map stays tidy.
 
 **Features**
 
 - A temporary JourneyMap waypoint on every ping, in cyan or the pinger's team colour
-- Auto-expires after 30 s (configurable 1–600 s, or fully persistent)
+- By default the waypoint expires in sync with the Ping-Wheel ping — they vanish together (or set a fixed 1–600 s, or make it permanent)
 - Made for co-op — rally points, "enemy spotted", "mine here" become visible at a glance
 - No items or blocks; it never interrupts Ping-Wheel's own behaviour, and won't crash if JourneyMap is absent
 
 **Config** (`config/pingtomap-client.toml`, or the Mod Config GUI)
 
-- `feature.registerOwnPings` — also waypoint your own pings (false = teammates' only)
-- `appearance.waypointLifetimeSec` — seconds the waypoint stays (-1 = permanent)
+- `appearance.syncWithPingWheel` — waypoint vanishes together with the ping, its lifetime following the ping's (default on)
+- `appearance.waypointLifetimeSec` — fixed lifetime in seconds, used only when sync is off (-1 = permanent)
 - `appearance.useTeamColor` — use your scoreboard team colour (false = fixed cyan)
+- `feature.registerOwnPings` — also waypoint your own pings (false = teammates' only)
 
 **Dependencies**
 
@@ -23,7 +24,7 @@ You ping "come here" with Ping-Wheel, but it never shows on the map, so on big b
 - [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target
 - Fabric only: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
 
-On the Fabric builds, JourneyMap registration is currently disabled (the JM Fabric jar needs an unreleased Loom version); the ping hook still fires.
+JourneyMap waypoints work on Forge and NeoForge. On Fabric the ping is received but the JourneyMap waypoint is disabled (the JM Fabric jar needs an unreleased Loom version) — for Fabric, use the sister mod Ping to Map: Xaero's edition, which works there.
 
 Client-side only — no server install needed. Sister mod: Compass to Map.
 
