@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.14.10'
     id 'maven-publish'
 }
 
@@ -11,6 +11,11 @@ base {
 }
 
 repositories {
+    // JourneyMap API (TeamJM 公式 maven)
+    maven {
+        name = "TeamJM"
+        url = "https://jm.gserv.me/repository/maven-public/"
+    }
     maven {
         name = "Modrinth"
         url = "https://api.modrinth.com/maven"
@@ -31,11 +36,27 @@ dependencies {
     // Dev-only
     modRuntimeOnly "maven.modrinth:ping-wheel:${ping_wheel_version_id}"
 
-    // FCAP の transitive: UnmodifiableConfig を compileOnly で公開
-    compileOnly "com.electronwill.night-config:core:3.6.7"
+    // FCAP の transitive: UnmodifiableConfig を compileOnly で公開 (FCAP v21.1.6 同梱版に合わせ 3.8.0)
+    compileOnly "com.electronwill.night-config:core:3.8.0"
+    // dev runtime に night-config 実体を供給 (FCAP の JiJ が dev で展開されないため。
+    // 本番では FCAP mod が core/toml 3.8.0 を同梱するため公開 jar には影響なし)
+    runtimeOnly "com.electronwill.night-config:core:3.8.0"
+    runtimeOnly "com.electronwill.night-config:toml:3.8.0"
 
-    // 注: JM Fabric は Loom 1.14 build (未公開) のため modCompileOnly 不可。
-    //     v1.0 Fabric では JM 連携 disable (Mixin で ping 受信ログのみ)。
+    // JourneyMap API: waypoint 登録用 (CLIENT のみ実体動作)。loom 1.14+ で remap 可。
+    modCompileOnly("info.journeymap:journeymap-api-fabric:2.0.0-1.21.1-SNAPSHOT") {
+        changing = true
+    }
+
+    // Dev-only: JourneyMap 本体 (runClient テスト用、公開 jar には含まれない)
+    modRuntimeOnly "maven.modrinth:journeymap:${jm_version}"
+    // JourneyMap Fabric の実行時依存 (Common Network by mysticdrew、dev runtime のみ)
+    modRuntimeOnly "maven.modrinth:common-network:qJXqSlRN"
+    // dev runtime に JM api 実体を供給 (Modrinth の JM jar は dev 解決で nested api を展開しない。
+    // 本番では JM 本体が api を同梱するため、公開 jar は compileOnly のまま影響なし)
+    modRuntimeOnly("info.journeymap:journeymap-api-fabric:2.0.0-1.21.1-SNAPSHOT") {
+        changing = true
+    }
 }
 
 processResources {
