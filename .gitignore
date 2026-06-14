@@ -42,3 +42,5 @@ repo/
 ### P2M dev artifacts ###
 # libs-local/ は dev 環境のみで使う Ping-Wheel jar 置き場 (リリース時は不使用、配布対象外)
 libs-local/
+# 並行/後続セッション向けの作業引き継ぎ (公開 repo に入れない)
+_handoff/
