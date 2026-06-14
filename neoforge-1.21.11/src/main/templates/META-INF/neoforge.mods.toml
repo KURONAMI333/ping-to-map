@@ -1,0 +1,54 @@
+# Ping to Map: Ping-Wheel × JourneyMap Addon - mods.toml
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="KURONAMI"
+displayURL="https://github.com/KURONAMI333/ping-to-map"
+issueTrackerURL="https://github.com/KURONAMI333/ping-to-map/issues"
+description='''
+Ping to Map (P2M) — Pop a temporary JourneyMap waypoint when a teammate (or yourself) pings a location with Ping-Wheel. Auto-disappears after a short time.
+'''
+
+# Mixin 設定: PingManager.acceptPingPacket をフックして JM API へ転送
+[[mixins]]
+config="pingtomap.mixins.json"
+
+# ─────────────────────────────────────────────────
+# 必須依存
+# ─────────────────────────────────────────────────
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.1,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Ping-Wheel: Mixin ターゲットのホスト (CLIENT で動作する)
+# versionRange は緩く取り、Mixin 不一致時は Mixin システム自体がエラーを吐く想定。
+[[dependencies.${mod_id}]]
+    modId="pingwheel"
+    type="required"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+# JourneyMap: waypoint 登録のターゲット (CLIENT 専用 MOD なのでサーバには不要)
+[[dependencies.${mod_id}]]
+    modId="journeymap"
+    type="optional"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="CLIENT"
