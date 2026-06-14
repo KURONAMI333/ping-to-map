@@ -15,7 +15,8 @@
   "environment": "client",
 
   "entrypoints": {
-    "client": ["com.kuronami.pingtomap.PingToMapFabric"]
+    "client": ["com.kuronami.pingtomap.PingToMapFabric"],
+    "journeymap": ["com.kuronami.pingtomap.compat.jm.PingToMapJourneyMapPlugin"]
   },
 
   "mixins": [
