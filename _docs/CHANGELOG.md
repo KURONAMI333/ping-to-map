@@ -6,7 +6,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [Semver](ht
 ## [Unreleased]
 
 ### Notes
-- v2 (Fabric backport, custom waypoint icons) は将来予定。
+- カスタム waypoint アイコンは将来予定。
+
+## [1.2.0] - 2026-06-15
+
+### Added
+- **Minecraft 1.21.4 / 1.21.11 対応**（Fabric + NeoForge）。JourneyMap waypoint フル対応。
+- Fabric 1.21.1 ビルドを **フル JourneyMap waypoint 化**（従来は ping 受信のチャット表示のみ）。NeoForge/Forge と同じ v2 API で一時 waypoint を自動登録する。
+
+### Compatibility
+- Minecraft 1.20.1 / 1.21.1 / 1.21.4 / 1.21.11 — NeoForge / Forge / Fabric — CLIENT 専用
+- 1.21.4 / 1.21.11 は Fabric + NeoForge（Forge は 1.20.1 / 1.21.1）
 
 ## [1.1.0] - 2026-06-03
 

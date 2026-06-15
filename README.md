@@ -8,16 +8,17 @@
 
 ---
 
-## Supported Loaders / Versions (v1.0.0+)
+## Supported Loaders / Versions
 
 | Minecraft | NeoForge | Forge | Fabric |
 |---|:---:|:---:|:---:|
-| 1.21.1 | ✅ | ✅ | ⚠️ chat-only |
-| 1.20.1 |  —  | ✅ | ⚠️ chat-only |
+| 1.20.1 |  —  | ✅ | ✅ |
+| 1.21.1 | ✅ | ✅ | ✅ |
+| 1.21.4 | ✅ | — | ✅ |
+| 1.21.11 | ✅ | — | ✅ |
 
 - ✅ = JourneyMap 統合フル対応（waypoint 自動登録）
-- ⚠️ chat-only = JourneyMap 統合 disable、ping 受信のみ ([既知制限](#known-limitations) 参照)
-- — = NeoForge は 1.20.1 リリースなし
+- — = そのローダーのビルドなし（NeoForge は 1.20.1 リリースなし、Forge は 1.21.4 以降なし）
 
 ---
 
@@ -50,8 +51,7 @@ Ping-Wheel は公式 API を持たないため、本 MOD は **Mixin** で `nx.p
    - 1.21.1 → [NeoForge](https://neoforged.net) / [Forge](https://files.minecraftforge.net) / [Fabric](https://fabricmc.net)
    - 1.20.1 → [Forge](https://files.minecraftforge.net) / [Fabric](https://fabricmc.net)
 2. [Ping-Wheel](https://modrinth.com/mod/ping-wheel) を導入（必須）
-3. **Forge / NeoForge のみ**: [JourneyMap](https://modrinth.com/mod/journeymap) を導入（推奨、これがないと waypoint 登録できない）  
-   **Fabric**: 現状 JM 統合 disable ([既知制限](#known-limitations))
+3. [JourneyMap](https://modrinth.com/mod/journeymap) を導入（推奨、これがないと waypoint 登録できない。全ローダー対応）
 4. **Fabric のみ**: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port) を追加導入
 5. リリースページから、自分のローダー × MC バージョン向けの `pingtomap` jar（最新版）を `mods/` フォルダに放り込む（**クライアントのみで OK**、サーバ不要）
 
@@ -82,13 +82,6 @@ Ping-Wheel は公式 API を持たないため、本 MOD は **Mixin** で `nx.p
 ---
 
 ## Known Limitations
-
-### Fabric ビルド: JourneyMap 統合 disable
-**1.20.1 / 1.21.1 の Fabric ビルドのみ**、JourneyMap への waypoint 自動登録が現状 **無効**。Mixin での Ping-Wheel フックは動くが、JM への登録呼び出しがスキップされる。
-
-理由: JourneyMap の Fabric ビルドは addon 用の client waypoint API（`IClientAPI` plugin インターフェース）を runtime で公開していない（Forge/NeoForge 専用）。compile 用 API jar は存在するが、JM 本体の Fabric jar が実装を含まないため、Fabric から JM に waypoint を追加することはできない。
-
-Fabric で map に ping を出したい場合は姉妹 MOD **Ping to Map: Xaero's edition** を使う（Xaero's は Fabric でも API を公開している）。
 
 ### NeoForge 1.20.1 ビルドなし
 NeoForge は 1.21+ から派生したプロジェクトのため、1.20.1 用 NeoForge ビルドは存在しない。1.20.1 で NeoForge 系を使いたい場合は Forge 1.20.1 ビルドを使ってください。
