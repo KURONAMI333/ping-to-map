@@ -44,3 +44,5 @@ repo/
 libs-local/
 # 並行/後続セッション向けの作業引き継ぎ (公開 repo に入れない)
 _handoff/
+# Fable↔Opus 引き継ぎログ (内部、公開 repo に入れない)
+GAP_LOG.md
