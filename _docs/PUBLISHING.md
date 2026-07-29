@@ -16,9 +16,9 @@ Modrinth / CurseForge への公開・更新手順。
 ### コード・ビルド
 
 - [ ] `mod_version` を `gradle.properties` で更新（semver）
-- [ ] 各サブプロジェクトで `./gradlew clean build`（NeoForge 1.21.1 = ルート、
-      `forge-1.20.1` / `fabric-1.21.1` / `fabric-1.20.1`）
+- [ ] 各サブプロジェクトで `./gradlew clean build`（NeoForge 1.21.1 = ルート、他は `<loader>-<mc>` の各ディレクトリ）
 - [ ] 各 `build/libs/pingtomap-x.y.z.jar` のサイズ確認（localRuntime 混入なし）
+- [ ] 各 jar に `LICENSE_pingtomap` が同梱されてること (`unzip -l <jar> | grep LICENSE`)
 - [ ] `./gradlew runClient` で実機確認
   - [ ] Ping-Wheel で ping → JM に一時 waypoint 出現（シアン/チームカラー）
   - [ ] 設定秒数で自動消滅
