@@ -1,0 +1,101 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.16.3'
+    id 'maven-publish'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+repositories {
+    // JourneyMap API (TeamJM 公式 maven)
+    maven {
+        name = "TeamJM"
+        url = "https://jm.gserv.me/repository/maven-public/"
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content { includeGroup "maven.modrinth" }
+    }
+}
+
+// MC 26.x は難読化解除済み (intermediary/proguard mappings 廃止)。mappings 宣言は不要
+// (26.2_MIGRATION_NOTES.md §1.1)。mod 依存も remap 不要なので modXxx ではなく通常の
+// implementation/compileOnly/runtimeOnly で載せる。
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "maven.modrinth:forge-config-api-port:${fcap_version}"
+
+    // Ping-Wheel (compileOnly: jar に含めない)
+    compileOnly "maven.modrinth:ping-wheel:${ping_wheel_version_id}"
+
+    // Dev-only
+    runtimeOnly "maven.modrinth:ping-wheel:${ping_wheel_version_id}"
+
+    // FCAP の transitive: UnmodifiableConfig を compileOnly で公開
+    compileOnly "com.electronwill.night-config:core:3.6.7"
+
+    // JourneyMap API: waypoint 登録用 (CLIENT のみ実体動作)
+    compileOnly("info.journeymap:journeymap-api-fabric:2.0.0-26.1-SNAPSHOT") {
+        changing = true
+    }
+
+    // Dev-only: JourneyMap 本体 (runClient テスト用、公開 jar には含まれない)
+    runtimeOnly "maven.modrinth:journeymap:${jm_version}"
+    // JourneyMap Fabric の実行時依存 (Common Network by mysticdrew、dev runtime のみ)
+    runtimeOnly "maven.modrinth:common-network:${common_network_version}"
+    // dev runtime に JM api 実体を供給 (Modrinth の JM jar は dev 解決で nested api を展開しない。
+    // 本番では JM 本体が api を同梱するため、公開 jar は compileOnly のまま影響なし)
+    runtimeOnly("info.journeymap:journeymap-api-fabric:2.0.0-26.1-SNAPSHOT") {
+        changing = true
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "minecraft_version": minecraft_version,
+                "loader_version": loader_version,
+                "fabric_version": fabric_version,
+                "mod_id": mod_id,
+                "mod_name": mod_name,
+                "mod_description": mod_description,
+                "mod_authors": mod_authors,
+                "mod_license": mod_license
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 25
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+// Mixin AP の strict mode 無効化 (外部 mod method の解決を skip)
+loom {
+    mixin {
+        useLegacyMixinAp = false
+    }
+}
+
+// LICENSE jar 同梱 (MIT shall be included in all copies)
+// LICENSE は repo root にのみ置く (各 cell は独立 build なので相対参照する)
+def licenseFile = file("../LICENSE")
+jar {
+    inputs.file(licenseFile)
+    from(licenseFile) {
+        rename { "${it}_${mod_id}" }
+    }
+}
