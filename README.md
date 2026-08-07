@@ -2,7 +2,7 @@
 
 > Pop a temporary JourneyMap waypoint when someone pings a location with Ping-Wheel.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
 [![Modrinth](https://img.shields.io/badge/Modrinth-ping--to--map-00AF5C)](https://modrinth.com/mod/ping-to-map)
 [![CurseForge](https://img.shields.io/badge/CurseForge-ping--to--map-F16436)](https://www.curseforge.com/minecraft/mc-mods/ping-to-map)
 
@@ -110,7 +110,7 @@ A. もちろん。役割が違うので衝突しません (C2M = 構造物・バ
 
 ## License
 
-[MIT License](LICENSE)
+[All Rights Reserved](LICENSE)
 
 ---
 

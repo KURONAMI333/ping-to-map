@@ -19,7 +19,7 @@
 - [x] mods.toml: EC required `[0,)` (Maven ハイフン比較罠回避) / JM optional `side="CLIENT"` / NeoForge `[21.1,)` (パッチで切らない)
 - [x] Config: 4 項目 (enabled / notifyOnFound / colorByCategory / persistentWaypoints)
 - [x] 22 言語 lang ファイル (en / ja は完全、他 20 言語は機械翻訳ベース)
-- [x] LICENSE (MIT)
+- [x] LICENSE (All Rights Reserved)
 - [x] README
 - [x] **JM 不在テスト合格** (NoClassDefFoundError なし、静かに無視)
 
@@ -68,4 +68,4 @@
 | ecApiBroken フラグ | EC API 不一致時に毎 tick × 全プレイヤーのログ汚染を防ぐ |
 | OP 限定 TP 提案 | サバイバルプレイヤーに「TP できる」誤期待を与えない |
 | Xaero 非対応 | Xaero に公式 API なし、ファイル直書きは shutdown 時に上書きで消える (Gravely 開発で実証) |
-| MIT ライセンス | modpack 採用しやすい |
+| All Rights Reserved (modpack 同梱は許可) | modpack 採用しやすい |
