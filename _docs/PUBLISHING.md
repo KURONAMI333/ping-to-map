@@ -36,7 +36,7 @@ Modrinth / CurseForge への公開・更新手順。
 
 - [ ] `displayURL` / `issueTrackerURL` が `github.com/KURONAMI333/ping-to-map`
 - [ ] `description` が現状機能と合致
-- [ ] `authors=KURONAMI` / `license=MIT`
+- [ ] `authors=KURONAMI` / `license=All Rights Reserved`
 
 ---
 
@@ -51,7 +51,7 @@ Modrinth / CurseForge への公開・更新手順。
 | Environment | **Client only**（サーバ不要） |
 | 依存 | **Ping-Wheel（必須）** / JourneyMap（任意・推奨、Forge/NeoForge のみ）/ Fabric は Forge Config API Port |
 | 既知制限 | Fabric ビルドは JM 統合 disable（Loom 1.14 未リリース）。チャット通知のみ |
-| License | MIT |
+| License | All Rights Reserved |
 
 > Description 本文は `README.md` をそのままコピペ（Modrinth は Markdown 可、
 > CurseForge は BBCode/HTML 変換）。jar 実ファイル名は `pingtomap-<version>.jar`
