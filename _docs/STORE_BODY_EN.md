@@ -1,5 +1,3 @@
-# Ping to Map
-
 Drops a temporary JourneyMap waypoint the instant someone pings a spot with Ping-Wheel.
 
 You ping "come here" with Ping-Wheel, but it never shows on the map, so on big builds people still can't find the spot. This addon puts a waypoint there the moment a ping happens, and by default it disappears together with the Ping-Wheel ping so the map stays tidy.
@@ -24,8 +22,8 @@ You ping "come here" with Ping-Wheel, but it never shows on the map, so on big b
 - [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target
 - Fabric only: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
 
-JourneyMap waypoints work on Fabric, Forge, and NeoForge alike. Minecraft 1.20.1, 1.21.1, 1.21.4, and 1.21.11 are supported (1.21.4 and 1.21.11 are Fabric + NeoForge; Forge covers 1.20.1 and 1.21.1).
+Sister mod: Compass to Map.
 
-Client-side only — no server install needed. Sister mod: Compass to Map.
+Bugs and questions: comment on the CurseForge page, or DM @kuronami333 on X.
 
-Free to use in any modpack. Source and issues: https://github.com/KURONAMI333/ping-to-map
+All Rights Reserved. Modpack inclusion is allowed without permission or credit. Source: https://github.com/KURONAMI333/ping-to-map
