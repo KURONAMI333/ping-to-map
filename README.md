@@ -117,7 +117,6 @@ A. もちろん。役割が違うので衝突しません (C2M = 構造物・バ
 ## Credits
 
 - Author: KURONAMI
-- Assist: Claude (Anthropic)
 - Built on:
   - [Ping-Wheel](https://modrinth.com/mod/ping-wheel) by LukenSkyne
   - [JourneyMap](https://modrinth.com/mod/journeymap) by TeamJM
