@@ -8,8 +8,8 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-displayURL="https://github.com/KURONAMI333/ping-to-map"
-issueTrackerURL="https://github.com/KURONAMI333/ping-to-map/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/ping-to-map"
+issueTrackerURL="https://www.curseforge.com/minecraft/mc-mods/ping-to-map/comments"
 description='''
 Ping to Map (P2M) for Forge 1.21.1 — Pop a temporary JourneyMap waypoint when a teammate (or yourself) pings a location with Ping-Wheel.
 '''

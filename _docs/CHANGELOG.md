@@ -8,6 +8,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [Semver](ht
 ### Notes
 - カスタム waypoint アイコンは将来予定。
 
+## [1.2.2] - 2026-09-07
+
+### Fixed
+- **Ping-Wheel が内部の実装を変えるとクライアントが起動しなくなる可能性を潰した**。Ping-Wheel には公開 API が無く `acceptPingPacket` を Mixin で掴んでいる。`require` を指定していなかったため、上流が署名を変えた時点で injection が失敗し、mixin config の `defaultRequire = 1` に当たって起動が止まる状態だった。`require = 0` を指定して、掴めなかった時は連携が黙って無効になるだけにした
+- **JourneyMap の API を netty の I/O スレッドから触っていた問題を修正**。`Minecraft.getInstance().execute(...)` でメインスレッドへ渡してから呼ぶようにした（Xaero 版が元からしていた形に揃えた）
+
+### Changed
+- MOD 一覧に出る配布元と、不具合の報告先を **CurseForge** に変更（従来は GitHub）。ソースへのリンクは GitHub のまま
+- 同梱ライセンスを MIT から All Rights Reserved に変更（配布ページの表記に合わせた）
+
+### Notes
+- CHANGELOG に記載が漏れていた公開版: **1.0.2**（2026-05-10 初回公開）/ **1.0.3**（2026-05-12）/ **1.2.1**（2026-06-19・1.20.1 の起動時クラッシュを修正。Mixin の compatibilityLevel を JAVA_21 から JAVA_17 へ）
+- 全セルを 1.2.2 に揃えた。1.21.1 の Forge / NeoForge は 1.1.0 のままだったが、これは受け取るべき変更が無かったためで、伝播漏れではない
+
 ## [1.2.0] - 2026-06-15
 
 ### Added
