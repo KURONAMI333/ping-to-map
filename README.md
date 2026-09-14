@@ -1,123 +1,50 @@
-# Ping to Map (P2M)
+# Ping to Map
 
-> Pop a temporary JourneyMap waypoint when someone pings a location with Ping-Wheel.
+Drops a temporary JourneyMap waypoint the instant someone pings a spot with Ping-Wheel.
 
-[![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
-[![Modrinth](https://img.shields.io/badge/Modrinth-ping--to--map-00AF5C)](https://modrinth.com/mod/ping-to-map)
-[![CurseForge](https://img.shields.io/badge/CurseForge-ping--to--map-F16436)](https://www.curseforge.com/minecraft/mc-mods/ping-to-map)
+You ping "come here" with Ping-Wheel, but it never shows on the map, so on big builds people still can't find the spot. This addon puts a waypoint there the moment a ping happens, and by default it disappears together with the Ping-Wheel ping so the map stays tidy.
 
----
+**Features**
 
-## Supported Loaders / Versions
+- A temporary JourneyMap waypoint on every ping, in cyan or the pinger's team colour
+- By default the waypoint expires in sync with the Ping-Wheel ping — they vanish together (or set a fixed 1–600 s, or make it permanent)
+- Made for co-op — rally points, "enemy spotted", "mine here" become visible at a glance
+- No items or blocks; it never interrupts Ping-Wheel's own behaviour, and won't crash if JourneyMap is absent
+
+**Config** (`config/pingtomap-client.toml`, or the Mod Config GUI)
+
+- `appearance.syncWithPingWheel` — waypoint vanishes together with the ping, its lifetime following the ping's (default on)
+- `appearance.waypointLifetimeSec` — fixed lifetime in seconds, used only when sync is off (-1 = permanent)
+- `appearance.useTeamColor` — use your scoreboard team colour (false = fixed cyan)
+- `feature.registerOwnPings` — also waypoint your own pings (set false for teammates' pings only)
+
+**Dependencies**
+
+- [Ping-Wheel](https://modrinth.com/mod/ping-wheel) — required
+- [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target
+- Fabric only: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
+
+Sister mod: Compass to Map.
+
+All Rights Reserved. Modpack inclusion is allowed without permission or credit. Source: https://github.com/KURONAMI333/ping-to-map
+
+## Published builds
+
+The table lists files attached to the public GitHub release; choose the file for your Minecraft version and loader.
 
 | Minecraft | NeoForge | Forge | Fabric |
 |---|:---:|:---:|:---:|
-| 1.20.1 |  —  | ✅ | ✅ |
-| 1.21.1 | ✅ | ✅ | ✅ |
-| 1.21.4 | ✅ | — | ✅ |
-| 1.21.11 | ✅ | — | ✅ |
+| 1.20.1 | — | Yes | Yes |
+| 1.21.1 | Yes | Yes | Yes |
+| 1.21.4 | Yes | — | Yes |
+| 1.21.11 | Yes | — | Yes |
+| 26.1.2 | Yes | — | Yes |
+| 26.2 | Yes | — | Yes |
 
-- ✅ = JourneyMap 統合フル対応（waypoint 自動登録）
-- — = そのローダーのビルドなし（NeoForge は 1.20.1 リリースなし、Forge は 1.21.4 以降なし）
+## Downloads and support
 
----
+Downloads: [CurseForge](https://www.curseforge.com/minecraft/mc-mods/ping-to-map) · [GitHub Releases](https://github.com/KURONAMI333/ping-to-map/releases/tag/v1.2.2).
 
-## Why Ping to Map?
+For bugs and questions, comment on the [CurseForge page](https://www.curseforge.com/minecraft/mc-mods/ping-to-map) or DM [@kuronami333 on X](https://x.com/kuronami333).
 
-Ping-Wheel で「あそこ来て！」って ping を打っても、**地図上には載らない**から大きい施設だと結局見つけにくい。  
-このアドオン MOD は **ping した瞬間に JM に一時 waypoint を立てる**。Ping-Wheel のピン表示時間に同期して消えるので（既定）地図が散らからない。
-
-- 📍 **Ping した瞬間に JM 上に一時 waypoint** (シアン or チームカラー)
-- 🤝 **チーム coop に最適** — 「集合場所」「敵発見」「採掘地点」を一目で共有
-- 🕒 **ピンと同時に自動消滅** — 既定で Ping-Wheel の pingDuration に同期（Config で固定 1〜600 秒や永続にも変更可）
-- 🌐 **クライアント MOD のみ** — サーバ側に入れる必要なし
-- 💡 **既存 MOD に依存**: Ping-Wheel + JourneyMap が既に入ってるなら追加するだけ
-
----
-
-## How it works (技術詳細)
-
-Ping-Wheel は公式 API を持たないため、本 MOD は **Mixin** で `nx.pingwheel.common.core.PingManager#acceptPingPacket` をフック。受信した `PingLocationS2CPacket` から座標と author UUID を取得し、`IClientAPI.addWaypoint` に転送する。
-
-- Mixin: `@Inject(at = @At("HEAD"))`、Ping-Wheel 本来の処理は止めない
-- Inner class isolation: JM 不在環境でも crash しない
-- 一時 waypoint: `persistent=false` + 自前の expire tracker で時間経過で削除
-
----
-
-## Installation
-
-1. **ローダーを導入** (Minecraft バージョンに合わせる):
-   - 1.21.1 → [NeoForge](https://neoforged.net) / [Forge](https://files.minecraftforge.net) / [Fabric](https://fabricmc.net)
-   - 1.20.1 → [Forge](https://files.minecraftforge.net) / [Fabric](https://fabricmc.net)
-2. [Ping-Wheel](https://modrinth.com/mod/ping-wheel) を導入（必須）
-3. [JourneyMap](https://modrinth.com/mod/journeymap) を導入（推奨、これがないと waypoint 登録できない。全ローダー対応）
-4. **Fabric のみ**: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port) を追加導入
-5. リリースページから、自分のローダー × MC バージョン向けの `pingtomap` jar（最新版）を `mods/` フォルダに放り込む（**クライアントのみで OK**、サーバ不要）
-
----
-
-## Configuration
-
-`config/pingtomap-client.toml` を編集（または NeoForge / Forge の Mod Settings GUI から）:
-
-| キー | 既定 | 説明 |
-|---|---|---|
-| `feature.enabled` | true | マスタースイッチ |
-| `feature.registerOwnPings` | true | 自分の ping も waypoint 化するか (false ならチームメイトの ping のみ) |
-| `appearance.waypointLifetimeSec` | 30 | waypoint が地図に残る秒数 (-1 で永続) |
-| `appearance.useTeamColor` | true | vanilla scoreboard team の色を使う (false ならシアン固定) |
-
----
-
-## Compatibility
-
-| MOD | サポート | 備考 |
-|---|---|---|
-| **Ping-Wheel** | required | Mixin ターゲット、必須 |
-| **JourneyMap** | optional (CLIENT のみ) | waypoint 登録のターゲット、なければ静かに無視 |
-| Voice Chat 系 (Plasmo Voice 等) | 影響なし | Ping-Wheel が両立してるので一緒に動く |
-| Xaero's Minimap / Worldmap | 未対応 | Xaero は公式 API なし |
-
----
-
-## Known Limitations
-
-### NeoForge 1.20.1 ビルドなし
-NeoForge は 1.21+ から派生したプロジェクトのため、1.20.1 用 NeoForge ビルドは存在しない。1.20.1 で NeoForge 系を使いたい場合は Forge 1.20.1 ビルドを使ってください。
-
----
-
-## FAQ
-
-**Q. サーバ側にも MOD 入れる必要ある？**  
-A. いいえ、**クライアントのみ**で動作します。Ping-Wheel 自体はサーバ要だが、P2M はクライアントで完結。
-
-**Q. 大量に ping すると waypoint が乱立しない？**  
-A. 同じプレイヤーが連続 ping した場合、古い waypoint は自動削除されます (UUID 単位で 1 つだけ保持)。
-
-**Q. ping したけど地図に出ない！**  
-A. 以下を確認:
-1. Ping-Wheel と JourneyMap が両方インストールされてるか
-2. `feature.enabled = true` か
-3. ping 距離が Ping-Wheel 設定 (`pingDistance`) の範囲内か (デフォルト 2048 ブロック)
-4. 自分の ping を表示したい場合 `feature.registerOwnPings = true`
-
-**Q. Compass to Map と一緒に使える？**  
-A. もちろん。役割が違うので衝突しません (C2M = 構造物・バイオーム発見、P2M = チーム ping)。
-
----
-
-## License
-
-[All Rights Reserved](LICENSE)
-
----
-
-## Credits
-
-- Author: KURONAMI
-- Built on:
-  - [Ping-Wheel](https://modrinth.com/mod/ping-wheel) by LukenSkyne
-  - [JourneyMap](https://modrinth.com/mod/journeymap) by TeamJM
-- Sister mod: [Compass to Map](https://github.com/KURONAMI333/compass-to-map) (EC × NC × JM addon)
+[Source](https://github.com/KURONAMI333/ping-to-map) · [License](LICENSE)
