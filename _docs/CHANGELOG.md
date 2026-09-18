@@ -10,6 +10,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [Semver](ht
 
 ## [1.2.2] - 2026-09-07
 
+### Added
+- **Minecraft 1.21.8** の Fabric / NeoForge セルを追加（版番号は 1.2.2 のまま additive。1.21.4 / 1.21.11 と同じくフル JourneyMap 連携）
+
 ### Fixed
 - **Ping-Wheel が内部の実装を変えるとクライアントが起動しなくなる可能性を潰した**。Ping-Wheel には公開 API が無く `acceptPingPacket` を Mixin で掴んでいる。`require` を指定していなかったため、上流が署名を変えた時点で injection が失敗し、mixin config の `defaultRequire = 1` に当たって起動が止まる状態だった。`require = 0` を指定して、掴めなかった時は連携が黙って無効になるだけにした
 - **JourneyMap の API を netty の I/O スレッドから触っていた問題を修正**。`Minecraft.getInstance().execute(...)` でメインスレッドへ渡してから呼ぶようにした（Xaero 版が元からしていた形に揃えた）
