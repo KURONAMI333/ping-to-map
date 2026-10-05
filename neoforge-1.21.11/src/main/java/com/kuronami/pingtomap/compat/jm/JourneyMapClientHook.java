@@ -25,17 +25,17 @@ import nx.pingwheel.common.network.PingLocationS2CPacket;
  *    毎 client tick ({@code PingWaypointTicker}) で期限切れをチェックして削除
  *  - 寿命は既定で Ping-Wheel の pingDuration に同期 ({@code resolveLifetimeSec}) →
  *    ワールド内の ping と map 上の waypoint が同時に消える
- *  - 同一プレイヤーが連続 ping した時は古い waypoint を上書き (UUID + sequence で識別)
+ *  - 同一プレイヤーが連続 ping した時は古い waypoint を上書き (author UUID で追跡)
  */
 public final class JourneyMapClientHook {
 
     /** ブランド色 (シアン、ping らしさ) */
     private static final int BRAND_COLOR = 0x00FFFF;
 
-    /** 登録した一時 waypoint の追跡 (UUID(author) → expireAtMillis + waypointGuid) */
+    /** 登録した一時 waypoint の追跡 (UUID(author) → expireAtNanos + waypointGuid) */
     private static final Map<UUID, ScheduledRemoval> TRACKED = Collections.synchronizedMap(new LinkedHashMap<>());
 
-    private record ScheduledRemoval(String waypointGuid, long expireAtMillis) {}
+    private record ScheduledRemoval(String waypointGuid, long expireAtNanos) {}
 
     private JourneyMapClientHook() {}
 
@@ -75,12 +75,12 @@ public final class JourneyMapClientHook {
     public static void sweepExpired() {
         if (TRACKED.isEmpty()) return;
         if (!isJourneyMapLoaded()) return;
-        long now = System.currentTimeMillis();
+        long now = System.nanoTime();
         synchronized (TRACKED) {
             Iterator<Map.Entry<UUID, ScheduledRemoval>> it = TRACKED.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<UUID, ScheduledRemoval> e = it.next();
-                if (e.getValue().expireAtMillis <= now) {
+                if (now - e.getValue().expireAtNanos >= 0) {
                     try {
                         Inner.remove(e.getValue().waypointGuid);
                     } catch (Throwable t) {
@@ -135,6 +135,7 @@ public final class JourneyMapClientHook {
      */
     private static final class Inner {
         static void show(PingLocationS2CPacket packet) {
+            if (Minecraft.getInstance().level == null) return;
             journeymap.api.v2.client.IClientAPI api = PingToMapJourneyMapPlugin.api;
             if (api == null) {
                 PingToMap.LOGGER.debug("JourneyMap API not yet initialized, skipping ping waypoint");
@@ -151,11 +152,9 @@ public final class JourneyMapClientHook {
                     (int) Math.floor(pos.z)
             );
 
-            // dimension: client の現在 dimension を使う (ping は同一 dim 内でのみ伝達される前提)
+            // Mixin が packet の次元 hash と現在の次元を照合済み。
             net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim =
-                    Minecraft.getInstance().level != null
-                            ? Minecraft.getInstance().level.dimension()
-                            : net.minecraft.world.level.Level.OVERWORLD;
+                    Minecraft.getInstance().level.dimension();
 
             String authorName = resolveAuthorName(packet.author());
             String displayName = "📍 " + authorName + "'s Ping";
@@ -180,8 +179,9 @@ public final class JourneyMapClientHook {
 
             // 期限を記録 (Ping-Wheel のピン表示時間に同期するのが既定 → 同時に消える)
             int lifetimeSec = resolveLifetimeSec();
-            if (lifetimeSec > 0) {
-                long expireAt = System.currentTimeMillis() + lifetimeSec * 1000L;
+            // 0秒は次の掃除で削除し、-1だけを永続として追跡しない。
+            if (lifetimeSec >= 0) {
+                long expireAt = System.nanoTime() + lifetimeSec * 1_000_000_000L;
                 TRACKED.put(packet.author(), new ScheduledRemoval(wp.getGuid(), expireAt));
             }
 
@@ -210,31 +210,35 @@ public final class JourneyMapClientHook {
         }
 
         private static String resolveAuthorName(UUID authorId) {
-            if (Minecraft.getInstance().level == null) return "Player";
-            AbstractClientPlayer p = Minecraft.getInstance().level.getPlayerByUUID(authorId)
-                    instanceof AbstractClientPlayer ap ? ap : null;
-            if (p != null) return p.getGameProfile().name();
-            // 自分?
-            UUID self = Minecraft.getInstance().player != null
-                    ? Minecraft.getInstance().player.getUUID() : null;
-            if (self != null && self.equals(authorId)) {
-                return Minecraft.getInstance().player.getGameProfile().name();
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.player.getUUID().equals(authorId)) {
+                return mc.player.getGameProfile().name();
+            }
+            if (mc.getConnection() != null) {
+                net.minecraft.client.multiplayer.PlayerInfo info = mc.getConnection().getPlayerInfo(authorId);
+                if (info != null) return info.getProfile().name();
+            }
+            if (mc.level != null && mc.level.getPlayerByUUID(authorId) instanceof AbstractClientPlayer p) {
+                return p.getGameProfile().name();
             }
             return "Player";
         }
 
-        /**
-         * vanilla scoreboard team の色を取得。team 未所属なら null。
-         */
+        /** Tab 一覧なら追跡範囲外の仲間からもチーム色を取得できる。 */
         private static Integer resolveTeamColor(UUID authorId) {
-            if (Minecraft.getInstance().level == null) return null;
-            net.minecraft.world.entity.player.Player p = Minecraft.getInstance().level.getPlayerByUUID(authorId);
-            if (p == null) return null;
-            net.minecraft.world.scores.PlayerTeam team = (net.minecraft.world.scores.PlayerTeam) p.getTeam();
+            Minecraft mc = Minecraft.getInstance();
+            net.minecraft.world.scores.PlayerTeam team = null;
+            if (mc.getConnection() != null) {
+                net.minecraft.client.multiplayer.PlayerInfo info = mc.getConnection().getPlayerInfo(authorId);
+                if (info != null) team = info.getTeam();
+            }
+            if (team == null && mc.level != null) {
+                net.minecraft.world.entity.player.Player p = mc.level.getPlayerByUUID(authorId);
+                if (p != null) team = (net.minecraft.world.scores.PlayerTeam) p.getTeam();
+            }
             if (team == null) return null;
             net.minecraft.ChatFormatting fmt = team.getColor();
-            if (fmt == null || fmt.getColor() == null) return null;
-            return fmt.getColor();
+            return fmt != null ? fmt.getColor() : null;
         }
     }
 }

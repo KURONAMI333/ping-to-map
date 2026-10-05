@@ -18,7 +18,7 @@ import nx.pingwheel.common.network.PingLocationS2CPacket;
 
 /**
  * Ping-Wheel S2C packet を JM 一時 waypoint に登録 (Forge 1.20.1, JM v1 API)。
- * 1.21+ の v2 API (WaypointFactory) との差分: Waypoint.Builder 経由。
+ * 1.21+ の v2 API (WaypointFactory) と異なり、JM 5.10.5 の v1 API を使う。
  *
  * 寿命は既定で Ping-Wheel の pingDuration に同期 ({@code resolveLifetimeSec})、毎 client tick
  * ({@code PingWaypointTicker}) で期限切れを掃除 → ワールド内の ping と waypoint が同時に消える。
@@ -28,7 +28,7 @@ public final class JourneyMapClientHook {
     private static final int BRAND_COLOR = 0x00FFFF;
     private static final Map<UUID, ScheduledRemoval> TRACKED = Collections.synchronizedMap(new LinkedHashMap<>());
 
-    private record ScheduledRemoval(String waypointGuid, long expireAtMillis) {}
+    private record ScheduledRemoval(String waypointId, long expireAtNanos) {}
 
     private JourneyMapClientHook() {}
 
@@ -61,14 +61,14 @@ public final class JourneyMapClientHook {
     public static void sweepExpired() {
         if (TRACKED.isEmpty()) return;
         if (!isJourneyMapLoaded()) return;
-        long now = System.currentTimeMillis();
+        long now = System.nanoTime();
         synchronized (TRACKED) {
             Iterator<Map.Entry<UUID, ScheduledRemoval>> it = TRACKED.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<UUID, ScheduledRemoval> e = it.next();
-                if (e.getValue().expireAtMillis <= now) {
+                if (now - e.getValue().expireAtNanos >= 0) {
                     try {
-                        Inner.remove(e.getValue().waypointGuid);
+                        Inner.remove(e.getValue().waypointId);
                     } catch (Throwable t) {
                         PingToMap.LOGGER.debug("ping waypoint removal failed: {}", t.toString());
                     }
@@ -87,7 +87,7 @@ public final class JourneyMapClientHook {
         synchronized (TRACKED) {
             for (ScheduledRemoval r : TRACKED.values()) {
                 try {
-                    Inner.remove(r.waypointGuid);
+                    Inner.remove(r.waypointId);
                 } catch (Throwable t) {
                     PingToMap.LOGGER.debug("ping waypoint clearAll removal failed: {}", t.toString());
                 }
@@ -117,7 +117,8 @@ public final class JourneyMapClientHook {
     }
 
     private static final class Inner {
-        static void show(PingLocationS2CPacket packet) {
+        static void show(PingLocationS2CPacket packet) throws Exception {
+            if (Minecraft.getInstance().level == null) return;
             journeymap.client.api.IClientAPI api = PingToMapJourneyMapPlugin.api;
             if (api == null) {
                 PingToMap.LOGGER.debug("JourneyMap API not yet initialized, skipping ping waypoint");
@@ -134,9 +135,7 @@ public final class JourneyMapClientHook {
             );
 
             net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim =
-                    Minecraft.getInstance().level != null
-                            ? Minecraft.getInstance().level.dimension()
-                            : net.minecraft.world.level.Level.OVERWORLD;
+                    Minecraft.getInstance().level.dimension();
 
             String authorName = resolveAuthorName(packet.author());
             String displayName = "📍 " + authorName + "'s Ping";
@@ -147,34 +146,30 @@ public final class JourneyMapClientHook {
                 if (teamColor != null) color = teamColor;
             }
 
-            // JM 1.20.1 v1 API: Waypoint.Builder pattern
-            journeymap.common.api.waypoint.Waypoint wp =
-                    new journeymap.common.api.waypoint.Waypoint.Builder(PingToMap.MODID)
-                            .withName(displayName)
-                            .withBlockPos(bpos)
-                            .withDimension(dim)
-                            .withColorInt(color)
-                            .isPersistent(false)
-                            .build();
-            api.addWaypoint(PingToMap.MODID, wp);
+            journeymap.client.api.display.Waypoint wp =
+                    new journeymap.client.api.display.Waypoint(PingToMap.MODID, displayName, dim, bpos);
+            wp.setColor(color);
+            wp.setPersistent(false);
+            api.show(wp);
 
             // 寿命は Ping-Wheel のピン表示時間に同期するのが既定 → 同時に消える
             int lifetimeSec = resolveLifetimeSec();
-            if (lifetimeSec > 0) {
-                long expireAt = System.currentTimeMillis() + lifetimeSec * 1000L;
-                TRACKED.put(packet.author(), new ScheduledRemoval(wp.getGuid(), expireAt));
+            // 0秒は次の掃除で削除し、-1だけを永続として追跡しない。
+            if (lifetimeSec >= 0) {
+                long expireAt = System.nanoTime() + lifetimeSec * 1_000_000_000L;
+                TRACKED.put(packet.author(), new ScheduledRemoval(wp.getId(), expireAt));
             }
 
             PingToMap.LOGGER.info("Ping waypoint registered: {} @ {} (color=0x{}, lifetime={}s)",
                     displayName, bpos, Integer.toHexString(color), lifetimeSec);
         }
 
-        static void remove(String waypointGuid) {
+        static void remove(String waypointId) {
             journeymap.client.api.IClientAPI api = PingToMapJourneyMapPlugin.api;
             if (api == null) return;
-            journeymap.common.api.waypoint.Waypoint wp = api.getWaypoint(PingToMap.MODID, waypointGuid);
+            journeymap.client.api.display.Waypoint wp = api.getWaypoint(PingToMap.MODID, waypointId);
             if (wp != null) {
-                api.removeWaypoint(PingToMap.MODID, wp);
+                api.remove(wp);
             }
         }
 
@@ -182,34 +177,42 @@ public final class JourneyMapClientHook {
             ScheduledRemoval prev = TRACKED.remove(author);
             if (prev == null) return;
             try {
-                remove(prev.waypointGuid);
+                remove(prev.waypointId);
             } catch (Throwable t) {
                 PingToMap.LOGGER.debug("previous ping waypoint removal failed: {}", t.toString());
             }
         }
 
         private static String resolveAuthorName(UUID authorId) {
-            if (Minecraft.getInstance().level == null) return "Player";
-            AbstractClientPlayer p = Minecraft.getInstance().level.getPlayerByUUID(authorId)
-                    instanceof AbstractClientPlayer ap ? ap : null;
-            if (p != null) return p.getGameProfile().getName();
-            UUID self = Minecraft.getInstance().player != null
-                    ? Minecraft.getInstance().player.getUUID() : null;
-            if (self != null && self.equals(authorId)) {
-                return Minecraft.getInstance().player.getGameProfile().getName();
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.player.getUUID().equals(authorId)) {
+                return mc.player.getGameProfile().getName();
+            }
+            if (mc.getConnection() != null) {
+                net.minecraft.client.multiplayer.PlayerInfo info = mc.getConnection().getPlayerInfo(authorId);
+                if (info != null) return info.getProfile().getName();
+            }
+            if (mc.level != null && mc.level.getPlayerByUUID(authorId) instanceof AbstractClientPlayer p) {
+                return p.getGameProfile().getName();
             }
             return "Player";
         }
 
+        /** Tab 一覧なら追跡範囲外の仲間からもチーム色を取得できる。 */
         private static Integer resolveTeamColor(UUID authorId) {
-            if (Minecraft.getInstance().level == null) return null;
-            net.minecraft.world.entity.player.Player p = Minecraft.getInstance().level.getPlayerByUUID(authorId);
-            if (p == null) return null;
-            net.minecraft.world.scores.PlayerTeam team = (net.minecraft.world.scores.PlayerTeam) p.getTeam();
+            Minecraft mc = Minecraft.getInstance();
+            net.minecraft.world.scores.PlayerTeam team = null;
+            if (mc.getConnection() != null) {
+                net.minecraft.client.multiplayer.PlayerInfo info = mc.getConnection().getPlayerInfo(authorId);
+                if (info != null) team = info.getTeam();
+            }
+            if (team == null && mc.level != null) {
+                net.minecraft.world.entity.player.Player p = mc.level.getPlayerByUUID(authorId);
+                if (p != null) team = (net.minecraft.world.scores.PlayerTeam) p.getTeam();
+            }
             if (team == null) return null;
             net.minecraft.ChatFormatting fmt = team.getColor();
-            if (fmt == null || fmt.getColor() == null) return null;
-            return fmt.getColor();
+            return fmt != null ? fmt.getColor() : null;
         }
     }
 }

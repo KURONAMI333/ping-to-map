@@ -19,7 +19,7 @@ You ping "come here" with Ping-Wheel, but it never shows on the map, so on big b
 **Dependencies**
 
 - [Ping-Wheel](https://modrinth.com/mod/ping-wheel) — required
-- [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target
+- [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target; Fabric 1.20.1 requires JourneyMap 6.x starting with addon version 1.2.3; Forge 1.20.1 targets JourneyMap 5.10.5
 - Fabric only: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
 
 Sister mod: Compass to Map.

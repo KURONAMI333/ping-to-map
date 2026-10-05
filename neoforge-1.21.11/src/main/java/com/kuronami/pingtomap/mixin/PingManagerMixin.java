@@ -46,6 +46,14 @@ public abstract class PingManagerMixin {
             // netty I/O thread から呼ばれるため、main thread にマーシャルしてから処理する。
             Minecraft.getInstance().execute(() -> {
                 try {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (packet == null || packet.isCorrupt() || mc.player == null
+                            || mc.level == null || mc.getConnection() == null) return;
+                    var pingConfig = nx.pingwheel.common.config.ClientConfig.HANDLER.getConfig();
+                    if (!packet.channel().equals(pingConfig.getChannel())) return;
+                    if (pingConfig.getPingDistance() < nx.pingwheel.common.config.ClientConfig.MAX_PING_DISTANCE
+                            && mc.player.position().distanceTo(packet.pos()) > pingConfig.getPingDistance()) return;
+                    if (packet.dimension() != mc.level.dimension().identifier().hashCode()) return;
                     com.kuronami.pingtomap.compat.jm.JourneyMapClientHook.onPingReceived(packet);
                 } catch (Throwable ignored) {
                     // JM 連携で何が起きても Ping-Wheel 通常動作を阻害しない。

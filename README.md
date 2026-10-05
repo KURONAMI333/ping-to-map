@@ -21,7 +21,7 @@ You ping "come here" with Ping-Wheel, but it never shows on the map, so on big b
 **Dependencies**
 
 - [Ping-Wheel](https://modrinth.com/mod/ping-wheel) — required
-- [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target
+- [JourneyMap](https://modrinth.com/mod/journeymap) (client) — the waypoint target; Fabric 1.20.1 requires JourneyMap 6.x starting with addon version 1.2.3; Forge 1.20.1 targets JourneyMap 5.10.5
 - Fabric only: [Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)
 
 Sister mod: Compass to Map.
@@ -30,13 +30,14 @@ All Rights Reserved. Modpack inclusion is allowed without permission or credit. 
 
 ## Published builds
 
-The table lists files attached to the public GitHub release; choose the file for your Minecraft version and loader.
+Choose the file for your Minecraft version and loader. The 1.21.8 builds are published on CurseForge and Modrinth; GitHub release assets may differ.
 
 | Minecraft | NeoForge | Forge | Fabric |
 |---|:---:|:---:|:---:|
 | 1.20.1 | — | Yes | Yes |
 | 1.21.1 | Yes | Yes | Yes |
 | 1.21.4 | Yes | — | Yes |
+| 1.21.8 | Yes | — | Yes |
 | 1.21.11 | Yes | — | Yes |
 | 26.1.2 | Yes | — | Yes |
 | 26.2 | Yes | — | Yes |

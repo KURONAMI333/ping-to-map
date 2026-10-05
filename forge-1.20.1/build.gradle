@@ -67,11 +67,9 @@ dependencies {
 
     compileOnly 'org.spongepowered:mixin:0.8.5'
 
-    // Ping-Wheel + JM via libs-local (Modrinth 307 redirect 問題回避)
+    // Ping-Wheel + JM 5.10.5 via libs-local (Modrinth 307 redirect 問題回避)
     compileOnly fg.deobf(files("libs-local/Ping-Wheel-1.12.1-forge-1.20.1.jar"))
-    compileOnly("info.journeymap:journeymap-api:2.0+1.20-forge-SNAPSHOT") {
-        changing = true
-    }
+    compileOnly fg.deobf(files("libs-local/journeymap-1.20.1-5.10.5-forge.jar"))
 
     runtimeOnly fg.deobf(files("libs-local/Ping-Wheel-1.12.1-forge-1.20.1.jar"))
     runtimeOnly fg.deobf(files("libs-local/journeymap-1.20.1-5.10.5-forge.jar"))

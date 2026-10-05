@@ -3,6 +3,17 @@
 All notable changes to Ping to Map (P2M) will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [Semver](https://semver.org/)
 
+## v1.2.3 - Unreleased
+
+- Fix JourneyMap 5.10.5 waypoint registration on Forge 1.20.1.
+### Fixed
+- Restore JourneyMap waypoints in Fabric 1.20.1 (JourneyMap 6 required in that cell).
+- Ignore pings from another dimension and pings rejected by Ping-Wheel's channel, distance or packet checks.
+- Keep the author name and team colour when a teammate is outside entity tracking range.
+- Make temporary waypoint expiry independent of operating-system clock adjustments.
+- Treat a manual lifetime of zero as immediate expiry; only -1 remains permanent.
+- Clarify the existing 1.21.8 downloads.
+
 ## [Unreleased]
 
 ### Notes
