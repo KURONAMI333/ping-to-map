@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [Semver](ht
 
 ## v1.2.3 - Unreleased
 
+- Use the same release filename format for both map editions: `ping-to-map-<journeymap|xaero>-<minecraft>-<loader>-<modversion>.jar`.
 - Fix JourneyMap 5.10.5 waypoint registration on Forge 1.20.1.
 ### Fixed
 - Restore JourneyMap waypoints in Fabric 1.20.1 (JourneyMap 6 required in that cell).

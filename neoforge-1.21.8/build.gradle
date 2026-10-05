@@ -157,3 +157,8 @@ tasks.named('jar', Jar).configure {
     inputs.file(licenseFile)
     from(licenseFile) { rename { licenseRenamed } }
 }
+
+// 地図名を同列に明示した正式配布JAR名。
+tasks.named('jar').configure {
+    archiveFileName = "ping-to-map-journeymap-${minecraft_version}-neoforge-${mod_version}.jar"
+}
