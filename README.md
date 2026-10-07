@@ -52,4 +52,4 @@ For bugs and questions, comment on the [CurseForge page](https://www.curseforge.
 
 ## Download filenames
 
-From version 1.2.3, release files use `ping-to-map-journeymap-<minecraft>-<loader>-<modversion>.jar`, for example `ping-to-map-journeymap-1.21.1-neoforge-1.2.3.jar`.
+From version 1.2.3, release files use `ping-to-map-journeymap-<modversion>+<loader>-<minecraft>.jar`, for example `ping-to-map-journeymap-1.2.3+neoforge-1.21.1.jar`.

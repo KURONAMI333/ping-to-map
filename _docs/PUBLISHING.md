@@ -4,8 +4,8 @@
 
 ## 配布ファイル
 
-JAR名は `ping-to-map-journeymap-<minecraft>-<loader>-<modversion>.jar`。
-例: `ping-to-map-journeymap-1.21.1-neoforge-1.2.3.jar`。
+JAR名は `ping-to-map-journeymap-<modversion>+<loader>-<minecraft>.jar`。
+例: `ping-to-map-journeymap-1.2.3+neoforge-1.21.1.jar`。
 JourneyMap版とXaero版は同じ命名形式を使う。MOD ID・namespace・版番号は変更しない。
 
 | loader | Minecraft |

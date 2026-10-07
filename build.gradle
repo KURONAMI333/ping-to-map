@@ -162,5 +162,5 @@ tasks.named('jar', Jar).configure {
 
 // 地図名を同列に明示した正式配布JAR名。
 tasks.named('jar').configure {
-    archiveFileName = "ping-to-map-journeymap-${minecraft_version}-neoforge-${mod_version}.jar"
+    archiveFileName = "ping-to-map-journeymap-${mod_version}+neoforge-${minecraft_version}.jar"
 }
